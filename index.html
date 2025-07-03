@@ -1,0 +1,2370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#3498db">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="msapplication-navbutton-color" content="#3498db">
+    <title>Gestor Empresarial Móvil</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        /* Estilos optimizados y mejorados */
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --info: #17a2b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            background: var(--light);
+            font-size: 16px;
+            padding-top: 50px;
+            color: #333;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .barra-tipo-cambio {
+            background: var(--secondary);
+            color: white;
+            padding: 10px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 50px;
+        }
+
+        .tasa-cambio-info {
+            font-size: 1.1em;
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 90%;
+        }
+
+        .app-container {
+            padding: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .modulo-seccion {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+            transition: background-color 0.3s, color 0.3s;
+            position: relative;
+        }
+
+        .modulo-seccion.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2, h3 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .btn-movil {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s;
+        }
+
+        .btn-movil:active {
+            transform: scale(0.96);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary { background-color: var(--primary); }
+        .btn-secondary { background-color: var(--secondary); }
+        .btn-success { background-color: var(--success); }
+        .btn-danger { background-color: var(--danger); }
+        .btn-warning { background-color: var(--warning); }
+        .btn-info { background-color: var(--info); }
+
+        .btn-movil:hover {
+            opacity: 0.9;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.2s;
+            background-color: #f9f9f9;
+        }
+        
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+
+        /* Estilos para verificación */
+        .codigo-verificacion-container {
+            background: #f0f9ff;
+            border: 2px dashed #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .codigo-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            letter-spacing: 5px;
+            color: var(--primary);
+            margin: 15px 0;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            font-family: monospace;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .advertencia-correo {
+            background: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 0.9em;
+        }
+        
+        .pasos-verificacion {
+            display: flex;
+            justify-content: space-around;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+        
+        .paso {
+            text-align: center;
+            flex: 1;
+            padding: 10px;
+            min-width: 100px;
+        }
+        
+        .numero-paso {
+            width: 30px;
+            height: 30px;
+            background: var(--info);
+            color: white;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        
+        .permiso-nivel {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .permiso-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-right: 10px;
+        }
+        
+        .permiso-badge.propietario {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .permiso-badge.empleado {
+            background: var(--info);
+            color: white;
+        }
+        
+        /* Animación de envío */
+        .enviando-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 0;
+        }
+        
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(52, 152, 219, 0.3);
+            border-top: 5px solid var(--secondary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .temporizador {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .progreso-envio {
+            width: 100%;
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+        
+        .barra-progreso {
+            height: 100%;
+            width: 0%;
+            background: var(--success);
+            transition: width 0.3s;
+        }
+
+        .tabla-movil {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.95em;
+        }
+
+        .tabla-movil th, .tabla-movil td {
+            border: 1px solid #eee;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .tabla-movil th {
+            background-color: var(--primary);
+            color: white;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+        }
+
+        .tabla-movil tr:nth-child(even) {
+            background-color: #f6f6f6;
+        }
+
+        .tabla-movil tr:hover {
+            background-color: #eef;
+        }
+
+        .mini-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1050;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .mini-modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 450px;
+            animation: scaleIn 0.3s ease-out;
+            position: relative;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .mini-modal-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #777;
+        }
+
+        .mini-modal-close-btn:hover {
+            color: #333;
+        }
+
+        .mini-modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .mini-modal-buttons .btn-movil {
+            width: auto;
+            padding: 10px 20px;
+            margin-bottom: 0;
+        }
+
+        .flex-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .flex-container .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .resumen-venta {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 1px solid #eee;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .resumen-venta p {
+            margin-bottom: 8px;
+            font-size: 1.05em;
+        }
+
+        .resumen-venta p strong {
+            color: var(--primary);
+        }
+
+        .lista-productos-venta {
+            list-style: none;
+            padding: 0;
+            margin-top: 10px;
+            border-top: 1px dashed #ddd;
+            padding-top: 10px;
+        }
+
+        .lista-productos-venta li {
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .lista-productos-venta li .item-info {
+            flex-grow: 1;
+        }
+
+        .lista-productos-venta li .item-actions {
+            margin-left: 15px;
+        }
+
+        .lista-productos-venta li button {
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .lista-productos-venta li button:hover {
+            background: #c0392b;
+        }
+
+        #confirm-exit-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #confirm-exit-modal .modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 400px;
+            animation: slideIn 0.3s ease-out;
+            text-align: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        #confirm-exit-modal h3 {
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        #confirm-exit-modal .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        #confirm-exit-modal .btn-confirm {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        #confirm-exit-modal .btn-confirm:hover {
+            opacity: 0.9;
+        }
+
+        #confirm-exit-modal .btn-yes {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        #confirm-exit-modal .btn-no {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            max-width: 90%;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        body.dark-mode {
+            background: #121212;
+            color: #f5f5f5;
+        }
+
+        body.dark-mode .modulo-seccion,
+        body.dark-mode .mini-modal-content,
+        body.dark-mode #confirm-exit-modal .modal-content {
+            background: #1e1e1e;
+            color: #f5f5f5;
+        }
+
+        body.dark-mode .codigo-verificacion-container {
+            background: #0d2b3d;
+            border-color: #1a5276;
+        }
+        
+        body.dark-mode .codigo-display {
+            background: #0d3a5c;
+            color: #85c1e9;
+        }
+        
+        body.dark-mode .advertencia-correo {
+            background: #332a00;
+            border-color: #ffc107;
+        }
+
+        body.dark-mode .form-input,
+        body.dark-mode .form-select,
+        body.dark-mode .form-textarea {
+            background: #2d2d2d;
+            color: #f5f5f5;
+            border-color: #444;
+        }
+
+        body.dark-mode .tabla-movil th {
+            background-color: #2d2d2d;
+        }
+
+        body.dark-mode .tabla-movil th,
+        body.dark-mode .tabla-movil td {
+            border-color: #444;
+        }
+
+        body.dark-mode .form-label {
+            color: #f5f5f5;
+        }
+        
+        body.dark-mode .resumen-venta {
+            background-color: #2d2d2d;
+            border-color: #444;
+        }
+
+        body.dark-mode .lista-productos-venta li {
+            background-color: #252525;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        body.dark-mode .barra-tipo-cambio {
+            background: #000;
+            box-shadow: 0 2px 5px rgba(255,255,255,0.1);
+        }
+
+        .search-container {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 15px;
+            padding-left: 40px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1em;
+            background-color: #f9f9f9;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            display: none;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .event-item {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+        .event-item.upcoming {
+            border-left: 5px solid var(--info);
+        }
+        .event-item.past {
+            opacity: 0.7;
+            text-decoration: line-through;
+        }
+        .event-item.ringing {
+            background-color: var(--warning);
+            animation: pulse 1s infinite alternate;
+        }
+        @keyframes pulse {
+            from { box-shadow: 0 0 0 0px var(--warning); }
+            to { box-shadow: 0 0 0 10px rgba(243,156,18,0); }
+        }
+        .event-item h4 {
+            margin-top: 0;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+        .event-item p {
+            font-size: 0.9em;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        .event-item .event-actions {
+            text-align: right;
+            margin-top: 10px;
+        }
+        .event-item .event-actions button {
+            padding: 5px 10px;
+            font-size: 0.8em;
+        }
+        body.dark-mode .event-item {
+            background-color: #252525;
+            border-color: #444;
+        }
+        body.dark-mode .event-item h4 {
+            color: #f5f5f5;
+        }
+        body.dark-mode .event-item p {
+            color: #ccc;
+        }
+
+        .fab-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: none;
+        }
+        .fab-button {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 2em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .fab-button:hover {
+            background-color: #2980b9;
+            transform: scale(1.05);
+        }
+        .fab-button:active {
+            transform: scale(0.95);
+        }
+
+        .btn-back-to-main {
+            position: absolute;
+            top: 15px; 
+            right: 15px; 
+            background-color: var(--info); 
+            color: white;
+            border: none;
+            border-radius: 50%; 
+            width: 40px;
+            height: 40px;
+            font-size: 1.2em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+            z-index: 900; 
+        }
+        .btn-back-to-main:hover {
+            opacity: 0.9;
+        }
+        .btn-back-to-main:active {
+            transform: scale(0.95);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .edit-btn {
+            background-color: var(--info);
+            color: white;
+        }
+        
+        .delete-btn {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .action-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .tasa-cambio-input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="barra-tipo-cambio">
+        <div class="tasa-cambio-info" id="tasa-cambio-info">Sistema de Gestión Empresarial</div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sección de Registro Inicial (solo aparece la primera vez) -->
+        <div id="seccion-registro" class="modulo-seccion">
+            <h3>Configuración Inicial</h3>
+            <div class="form-group">
+                <label for="usuario-rol" class="form-label">Rol:</label>
+                <select id="usuario-rol" class="form-select" onchange="toggleRegistroFields()">
+                    <option value="">Seleccionar rol</option>
+                    <option value="propietario">Propietario</option>
+                    <option value="empleado">Empleado</option>
+                </select>
+            </div>
+
+            <div id="propietario-fields" style="display:none;">
+                <div class="form-group">
+                    <label for="tienda-nombre" class="form-label">Nombre de la Tienda:</label>
+                    <input type="text" id="tienda-nombre" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="propietario-nombre" class="form-label">Nombre Completo:</label>
+                    <input type="text" id="propietario-nombre" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="propietario-email" class="form-label">Correo Electrónico:</label>
+                    <input type="email" id="propietario-email" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="propietario-telefono" class="form-label">Teléfono:</label>
+                    <input type="tel" id="propietario-telefono" class="form-input" required>
+                </div>
+                <button class="btn-movil btn-primary" id="btn-enviar-codigo" onclick="enviarCodigoVerificacion()">Enviar Código</button>
+            </div>
+
+            <div id="empleado-fields" style="display:none;">
+                <div class="form-group">
+                    <label for="codigo-emparejamiento" class="form-label">Código de Emparejamiento:</label>
+                    <input type="text" id="codigo-emparejamiento" class="form-input" placeholder="Ingresa el código">
+                </div>
+                <div class="form-group">
+                    <label for="empleado-nombre" class="form-label">Nombre Completo:</label>
+                    <input type="text" id="empleado-nombre" class="form-input">
+                </div>
+                <button class="btn-movil btn-primary" onclick="validarCodigoEmpleado()">Validar Código</button>
+            </div>
+
+            <div id="codigo-verificacion" style="display:none;">
+                <div class="codigo-verificacion-container">
+                    <h4>Verificación de Correo Electrónico</h4>
+                    
+                    <div class="pasos-verificacion">
+                        <div class="paso">
+                            <div class="numero-paso">1</div>
+                            <div>Enviamos un código a tu correo</div>
+                        </div>
+                        <div class="paso">
+                            <div class="numero-paso">2</div>
+                            <div>Revisa tu bandeja de entrada</div>
+                        </div>
+                        <div class="paso">
+                            <div class="numero-paso">3</div>
+                            <div>Ingresa el código aquí</div>
+                        </div>
+                    </div>
+                    
+                    <div class="enviando-container" id="enviando-container">
+                        <div class="loader"></div>
+                        <div class="temporizador" id="temporizador">Enviando código...</div>
+                        <div class="progreso-envio">
+                            <div class="barra-progreso" id="barra-progreso"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="codigo-container" style="display:none;">
+                        <div class="advertencia-correo">
+                            ⚠️ Si no ves el correo, revisa tu carpeta de SPAM. 
+                            El código puede tardar algunos minutos en llegar.
+                        </div>
+                        
+                        <div class="codigo-display" id="codigo-display">- - - - - -</div>
+                        <p>Este es tu código de verificación. Ingrésalo abajo.</p>
+                        
+                        <div class="form-group">
+                            <label for="codigo-input" class="form-label">Código de Verificación:</label>
+                            <input type="text" id="codigo-input" class="form-input" placeholder="Ingresa el código recibido">
+                        </div>
+                        <button class="btn-movil btn-success" onclick="verificarCodigo()">Verificar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menú principal -->
+        <div id="main-menu" class="modulo-seccion">
+            <div class="permiso-nivel">
+                <span class="permiso-badge propietario" id="badge-rol">Propietario</span>
+                <span>Bienvenido, <span id="nombre-usuario">Usuario</span></span>
+            </div>
+            
+            <button class="btn-movil btn-primary" onclick="mostrarSeccion('seccion-ventas')">Gestión de Ventas</button>
+            <button class="btn-movil btn-secondary" onclick="mostrarSeccion('seccion-inventario')">Gestión de Inventario</button>
+            <button class="btn-movil btn-success" onclick="mostrarSeccion('seccion-clientes')">Gestión de Clientes</button>
+            <button class="btn-movil btn-info" onclick="mostrarSeccion('seccion-proveedores')">Gestión de Proveedores</button>
+            <button class="btn-movil btn-warning" onclick="mostrarSeccion('seccion-contabilidad')">Contabilidad</button>
+            <button class="btn-movil btn-primary" onclick="mostrarSeccion('seccion-facturacion')">Facturación</button>
+            <button class="btn-movil btn-secondary" onclick="mostrarSeccion('seccion-reportes')">Reportes</button>
+            <button class="btn-movil btn-primary" onclick="mostrarSeccion('seccion-ajustes')">Ajustes</button>
+            <button class="btn-movil btn-danger" onclick="cerrarSesion()">Cerrar Sesión</button>
+        </div>
+
+        <!-- Sección de Ventas -->
+        <div id="seccion-ventas" class="modulo-seccion">
+            <button class="btn-back-to-main" onclick="volverAlMenuPrincipal()">🏠</button>
+            <h3>Nueva Venta</h3>
+            <div class="permiso-nivel">
+                <span class="permiso-badge" id="badge-rol-ventas">Empleado</span>
+                <span id="nombre-vendedor">Vendedor: Carlos Pérez</span>
+            </div>
+            
+            <div class="form-group">
+                <label for="cliente-venta" class="form-label">Cliente:</label>
+                <input type="text" id="cliente-venta" class="form-input" list="lista-clientes-venta" placeholder="Buscar o añadir cliente">
+                <datalist id="lista-clientes-venta"></datalist>
+            </div>
+            
+            <div class="form-group">
+                <label for="metodo-pago" class="form-label">Método de Pago:</label>
+                <select id="metodo-pago" class="form-select">
+                    <option value="efectivo">Efectivo</option>
+                    <option value="transferencia">Transferencia</option>
+                    <option value="tarjeta">Tarjeta</option>
+                    <option value="pago-movil">Pago Móvil</option>
+                </select>
+            </div>
+
+            <button class="btn-movil btn-primary" onclick="mostrarMiniModalAgregarProducto()">Añadir Producto a Venta</button>
+
+            <h4>Productos en Venta</h4>
+            <ul id="productos-en-venta-lista" class="lista-productos-venta">
+                <li class="empty-state">No hay productos en el carrito</li>
+            </ul>
+
+            <div class="resumen-venta">
+                <p>Total USD: <strong id="total-usd">0.00</strong></p>
+                <p>Total VES: <strong id="total-ves">0.00</strong></p>
+            </div>
+
+            <button class="btn-movil btn-success" onclick="procesarVenta()">Procesar Venta</button>
+            <button class="btn-movil btn-secondary" onclick="volverAlMenuPrincipal()">Volver</button>
+        </div>
+
+        <!-- Modal para agregar productos -->
+        <div id="mini-modal-agregar-producto" class="mini-modal">
+            <div class="mini-modal-content">
+                <button class="mini-modal-close-btn" onclick="ocultarMiniModalAgregarProducto()">&times;</button>
+                <h3>Añadir Producto</h3>
+                <div class="form-group">
+                    <label for="producto-input" class="form-label">Producto:</label>
+                    <input type="text" id="producto-input" class="form-input" list="lista-productos-datalist" placeholder="Buscar producto...">
+                    <datalist id="lista-productos-datalist"></datalist>
+                </div>
+                <div class="form-group">
+                    <label for="cantidad-producto" class="form-label">Cantidad:</label>
+                    <input type="number" id="cantidad-producto" class="form-input" min="1" value="1">
+                </div>
+                <div class="mini-modal-buttons">
+                    <button class="btn-movil btn-primary" onclick="agregarProductoAVenta()">Añadir</button>
+                    <button class="btn-movil btn-secondary" onclick="ocultarMiniModalAgregarProducto()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Inventario -->
+        <div id="seccion-inventario" class="modulo-seccion">
+            <button class="btn-back-to-main" onclick="volverAlMenuPrincipal()">🏠</button>
+            <h3>Gestión de Inventario</h3>
+            <button class="btn-movil btn-primary" onclick="mostrarMiniModalProducto()">Añadir Nuevo Producto</button>
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="search-producto" placeholder="Buscar producto..." onkeyup="filtrarProductos()">
+            </div>
+            <table class="tabla-movil">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Precio (USD)</th>
+                        <th>Stock</th>
+                        <th>Categoría</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="inventario-lista">
+                    <tr><td colspan="6" class="empty-state">Cargando inventario...</td></tr>
+                </tbody>
+            </table>
+            <button class="btn-movil btn-secondary" onclick="volverAlMenuPrincipal()">Volver</button>
+        </div>
+
+        <!-- Modal para productos -->
+        <div id="mini-modal-producto" class="mini-modal">
+            <div class="mini-modal-content">
+                <button class="mini-modal-close-btn" onclick="ocultarMiniModalProducto()">&times;</button>
+                <h3 id="modal-producto-titulo">Añadir Producto</h3>
+                <input type="hidden" id="producto-id-editar">
+                <div class="form-group">
+                    <label for="producto-nombre" class="form-label">Nombre:</label>
+                    <input type="text" id="producto-nombre" class="form-input">
+                </div>
+                <div class="flex-container">
+                    <div class="form-group">
+                        <label for="producto-precio" class="form-label">Precio (USD):</label>
+                        <input type="number" id="producto-precio" class="form-input" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="producto-stock" class="form-label">Stock:</label>
+                        <input type="number" id="producto-stock" class="form-input" min="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="producto-categoria" class="form-label">Categoría:</label>
+                    <input type="text" id="producto-categoria" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="producto-codigo" class="form-label">Código de Barras:</label>
+                    <input type="text" id="producto-codigo" class="form-input">
+                </div>
+                <div class="mini-modal-buttons">
+                    <button class="btn-movil btn-primary" onclick="guardarProducto()">Guardar Producto</button>
+                    <button class="btn-movil btn-secondary" onclick="ocultarMiniModalProducto()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Clientes -->
+        <div id="seccion-clientes" class="modulo-seccion">
+            <button class="btn-back-to-main" onclick="volverAlMenuPrincipal()">🏠</button>
+            <h3>Gestión de Clientes</h3>
+            <button class="btn-movil btn-primary" onclick="mostrarMiniModalCliente()">Añadir Nuevo Cliente</button>
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="search-cliente" placeholder="Buscar cliente..." onkeyup="filtrarClientes()">
+            </div>
+            <table class="tabla-movil">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Teléfono</th>
+                        <th>Email</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="clientes-lista">
+                    <tr><td colspan="5" class="empty-state">Cargando clientes...</td></tr>
+                </tbody>
+            </table>
+            <button class="btn-movil btn-secondary" onclick="volverAlMenuPrincipal()">Volver</button>
+        </div>
+
+        <!-- Modal para clientes -->
+        <div id="mini-modal-cliente" class="mini-modal">
+            <div class="mini-modal-content">
+                <button class="mini-modal-close-btn" onclick="ocultarMiniModalCliente()">&times;</button>
+                <h3 id="modal-cliente-titulo">Añadir Cliente</h3>
+                <input type="hidden" id="cliente-id-editar">
+                <div class="form-group">
+                    <label for="cliente-nombre" class="form-label">Nombre:</label>
+                    <input type="text" id="cliente-nombre" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="cliente-telefono" class="form-label">Teléfono:</label>
+                    <input type="text" id="cliente-telefono" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="cliente-email" class="form-label">Email:</label>
+                    <input type="email" id="cliente-email" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="cliente-direccion" class="form-label">Dirección:</label>
+                    <textarea id="cliente-direccion" class="form-textarea"></textarea>
+                </div>
+                <div class="mini-modal-buttons">
+                    <button class="btn-movil btn-primary" onclick="guardarCliente()">Guardar Cliente</button>
+                    <button class="btn-movil btn-secondary" onclick="ocultarMiniModalCliente()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Proveedores -->
+        <div id="seccion-proveedores" class="modulo-seccion">
+            <button class="btn-back-to-main" onclick="volverAlMenuPrincipal()">🏠</button>
+            <h3>Gestión de Proveedores</h3>
+            <button class="btn-movil btn-primary" onclick="mostrarMiniModalProveedor()">Añadir Nuevo Proveedor</button>
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="search-proveedor" placeholder="Buscar proveedor..." onkeyup="filtrarProveedores()">
+            </div>
+            <table class="tabla-movil">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Contacto</th>
+                        <th>Teléfono</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="proveedores-lista">
+                    <tr><td colspan="5" class="empty-state">Cargando proveedores...</td></tr>
+                </tbody>
+            </table>
+            <button class="btn-movil btn-secondary" onclick="volverAlMenuPrincipal()">Volver</button>
+        </div>
+
+        <!-- Modal para proveedores -->
+        <div id="mini-modal-proveedor" class="mini-modal">
+            <div class="mini-modal-content">
+                <button class="mini-modal-close-btn" onclick="ocultarMiniModalProveedor()">&times;</button>
+                <h3 id="modal-proveedor-titulo">Añadir Proveedor</h3>
+                <input type="hidden" id="proveedor-id-editar">
+                <div class="form-group">
+                    <label for="proveedor-nombre" class="form-label">Nombre:</label>
+                    <input type="text" id="proveedor-nombre" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="proveedor-contacto" class="form-label">Persona de Contacto:</label>
+                    <input type="text" id="proveedor-contacto" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="proveedor-telefono" class="form-label">Teléfono:</label>
+                    <input type="text" id="proveedor-telefono" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="proveedor-email" class="form-label">Email:</label>
+                    <input type="email" id="proveedor-email" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="proveedor-rif" class="form-label">RIF:</label>
+                    <input type="text" id="proveedor-rif" class="form-input">
+                </div>
+                <div class="mini-modal-buttons">
+                    <button class="btn-movil btn-primary" onclick="guardarProveedor()">Guardar Proveedor</button>
+                    <button class="btn-movil btn-secondary" onclick="ocultarMiniModalProveedor()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Contabilidad -->
+        <div id="seccion-contabilidad" class="modulo-seccion">
+            <button class="btn-back-to-main" onclick="volverAlMenuPrincipal()">🏠</button>
+            <h3>Contabilidad</h3>
+            <button class="btn-movil btn-info" onclick="mostrarMiniModalTransaccion()">Añadir Transacción</button>
+            <div class="resumen-venta" style="margin-top: 20px;">
+                <p>Balance Total (USD): <strong id="balance-total-usd">0.00</strong></p>
+                <p>Balance Total (VES): <strong id="balance-total-ves">0.00</strong></p>
+            </div>
+            <h4>Transacciones Recientes</h4>
+            <table class="tabla-movil">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tipo</th>
+                        <th>Descripción</th>
+                        <th>Monto (USD)</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="lista-transacciones">
+                    <tr><td colspan="5" class="empty-state">Cargando transacciones...</td></tr>
+                </tbody>
+            </table>
+            <button class="btn-movil btn-secondary" onclick="volverAlMenuPrincipal()">Volver</button>
+        </div>
+
+        <!-- Modal para transacciones -->
+        <div id="mini-modal-transaccion" class="mini-modal">
+            <div class="mini-modal-content">
+                <button class="mini-modal-close-btn" onclick="ocultarMiniModalTransaccion()">&times;</button>
+                <h3>Añadir Transacción</h3>
+                <input type="hidden" id="transaccion-id-editar">
+                <div class="form-group">
+                    <label for="transaccion-tipo" class="form-label">Tipo:</label>
+                    <select id="transaccion-tipo" class="form-select">
+                        <option value="ingreso">Ingreso</option>
+                        <option value="egreso">Egreso</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="transaccion-monto" class="form-label">Monto (USD):</label>
+                    <input type="number" id="transaccion-monto" class="form-input" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="transaccion-descripcion" class="form-label">Descripción:</label>
+                    <input type="text" id="transaccion-descripcion" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="transaccion-fecha" class="form-label">Fecha:</label>
+                    <input type="date" id="transaccion-fecha" class="form-input">
+                </div>
+                <div class="mini-modal-buttons">
+                    <button class="btn-movil btn-primary" onclick="guardarTransaccion()">Guardar Transacción</button>
+                    <button class="btn-movil btn-secondary" onclick="ocultarMiniModalTransaccion()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Facturación -->
+        <div id="seccion-facturacion" class="modulo-seccion">
+            <button class="btn-back-to-main" onclick="volverAlMenuPrincipal()">🏠</button>
+            <h3>Historial de Facturación</h3>
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="search-factura" placeholder="Buscar factura por cliente..." onkeyup="filtrarFacturas()">
+            </div>
+            <table class="tabla-movil">
+                <thead>
+                    <tr>
+                        <th>ID Factura</th>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Total USD</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="lista-facturas">
+                    <tr><td colspan="5" class="empty-state">Cargando facturas...</td></tr>
+                </tbody>
+            </table>
+            <button class="btn-movil btn-secondary" onclick="volverAlMenuPrincipal()">Volver</button>
+        </div>
+
+        <!-- Sección de Reportes -->
+        <div id="seccion-reportes" class="modulo-seccion">
+            <button class="btn-back-to-main" onclick="volverAlMenuPrincipal()">🏠</button>
+            <h3>Reportes</h3>
+            <div class="form-group">
+                <label for="reporte-tipo" class="form-label">Tipo de Reporte:</label>
+                <select id="reporte-tipo" class="form-select" onchange="generarReporte()">
+                    <option value="ventas-dia">Ventas del Día</option>
+                    <option value="productos-vendidos">Productos Más Vendidos</option>
+                    <option value="ventas-cliente">Ventas por Cliente</option>
+                </select>
+            </div>
+            <div id="reporte-contenido">
+                <p class="empty-state">Selecciona un tipo de reporte para visualizar los datos.</p>
+            </div>
+            <button class="btn-movil btn-secondary" onclick="volverAlMenuPrincipal()">Volver</button>
+        </div>
+
+        <!-- Sección de Ajustes -->
+        <div id="seccion-ajustes" class="modulo-seccion">
+            <button class="btn-back-to-main" onclick="volverAlMenuPrincipal()">🏠</button>
+            <h3>Ajustes</h3>
+            <div class="form-group">
+                <label for="api-key" class="form-label">API Key de Tasa de Cambio:</label>
+                <input type="text" id="api-key" class="form-input" placeholder="'https://api.exchangerate-api.com/v6/{YOUR_API_KEY}/latest/USD'">
+                <small style="display: block; margin-top: 5px; color: #666;">Necesaria para la actualización automática del tipo de cambio. Puedes obtenerla en <a href="https://www.exchangerate-api.com" target="_blank">exchangerate-api.com</a></small>
+            </div>
+            <button class="btn-movil btn-primary" onclick="guardarAPIKey()">Guardar API Key</button>
+            <button class="btn-movil btn-secondary" onclick="obtenerTipoCambio()">Actualizar Tipo de Cambio Ahora</button>
+            
+            <div class="form-group" style="margin-top: 20px;">
+                <label for="tasa-manual" class="form-label">Tasa de Cambio Manual (VES/USD):</label>
+                <input type="number" id="tasa-manual" class="form-input" step="0.01" placeholder="Ingresa tasa manual">
+            </div>
+            <button class="btn-movil btn-info" onclick="guardarTasaManual()">Guardar Tasa Manual</button>
+            
+            <hr style="margin: 30px 0; border-color: #eee;">
+            
+            <h4>Configuración de la Interfaz</h4>
+            <button class="btn-movil btn-info" onclick="toggleTheme()">Cambiar Tema (Oscuro/Claro)</button>
+            <button class="btn-movil btn-primary" onclick="toggleFullscreen()">Activar/Desactivar Pantalla Completa</button>
+
+            <hr style="margin: 30px 0; border-color: #eee;">
+
+            <h4>Eventos, Alarmas y Notificaciones</h4>
+            <button class="btn-movil btn-info" onclick="mostrarMiniModalEvento()">Añadir Nuevo Evento/Alarma</button>
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="search-evento" placeholder="Buscar evento..." onkeyup="filtrarEventos()">
+            </div>
+            <div id="lista-eventos" style="margin-top: 15px;">
+                <p class="empty-state">No hay eventos programados.</p>
+            </div>
+            
+            <hr style="margin: 30px 0; border-color: #eee;">
+
+            <button class="btn-movil btn-danger" onclick="resetearDatos()">Resetear Todos los Datos</button>
+            <button class="btn-movil btn-secondary" onclick="volverAlMenuPrincipal()">Volver</button>
+        </div>
+
+        <!-- Modal para eventos -->
+        <div id="mini-modal-evento" class="mini-modal">
+            <div class="mini-modal-content">
+                <button class="mini-modal-close-btn" onclick="ocultarMiniModalEvento()">&times;</button>
+                <h3 id="modal-evento-titulo">Añadir Evento</h3>
+                <input type="hidden" id="evento-id-editar">
+                <div class="form-group">
+                    <label for="evento-titulo" class="form-label">Título del Evento:</label>
+                    <input type="text" id="evento-titulo" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="evento-descripcion" class="form-label">Descripción:</label>
+                    <textarea id="evento-descripcion" class="form-textarea"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="evento-fecha" class="form-label">Fecha:</label>
+                    <input type="date" id="evento-fecha" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="evento-hora" class="form-label">Hora:</label>
+                    <input type="time" id="evento-hora" class="form-input">
+                </div>
+                <div class="mini-modal-buttons">
+                    <button class="btn-movil btn-primary" onclick="guardarEvento()">Guardar Evento</button>
+                    <button class="btn-movil btn-secondary" onclick="ocultarMiniModalEvento()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación de Salida Personalizado -->
+    <div id="confirm-exit-modal">
+        <div class="modal-content">
+            <h3>¿Estás seguro que deseas salir?</h3>
+            <p>Si tienes una venta en proceso, los datos no guardados podrían perderse.</p>
+            <div class="modal-buttons">
+                <button class="btn-confirm btn-yes" onclick="confirmExit(true)">Sí, salir</button>
+                <button class="btn-confirm btn-no" onclick="confirmExit(false)">No, quedarme</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-notification" class="toast"></div>
+
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p id="loading-text">Procesando...</p>
+    </div>
+
+    <audio id="alarm-sound" src="https://www.soundjay.com/misc/sounds/alarm-clock-01.mp3" preload="auto"></audio>
+
+    <!-- Botón flotante para Gestión de Ventas -->
+    <div id="fab-ventas" class="fab-container">
+        <button class="fab-button" onclick="mostrarSeccion('seccion-ventas')">
+            🛒
+        </button>
+    </div>
+
+    <script>
+        // Objeto global para almacenar los datos de la aplicación
+        let db = {
+            productos: [],
+            clientes: [],
+            ventas: [],
+            proveedores: [], 
+            transacciones: [], 
+            eventos: [], 
+            tipoCambioReal: 0, 
+            tipoCambioCalculo: 0, 
+            apiKey: '',
+            tasasCambioAlternativas: []  
+        };
+
+        let productosEnVenta = []; 
+        let currentSection = 'main-menu'; 
+        let backButtonPressedOnce = false; 
+        let alarmInterval; 
+        let usuarioActual = null;
+        let codigoGenerado = null;
+
+        // Funciones de utilidad
+        function showToast(message, duration = 3000) {
+            const toast = document.getElementById('toast-notification');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+
+        function showLoading(message = 'Procesando...') {
+            document.getElementById('loading-text').textContent = message;
+            document.getElementById('loading-overlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-overlay').style.display = 'none';
+        }
+
+        function showExitConfirmation() {
+            document.getElementById('confirm-exit-modal').style.display = 'flex';
+        }
+
+        function confirmExit(shouldExit) {
+            document.getElementById('confirm-exit-modal').style.display = 'none';
+            if (shouldExit) {
+                showToast('Sesión finalizada. Puedes cerrar la aplicación.', 3000);
+            }
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+            
+            const themeColor = isDarkMode ? '#121212' : '#2c3e50';
+            document.querySelector('meta[name="theme-color"]').setAttribute('content', themeColor);
+            
+            showToast(isDarkMode ? 'Modo oscuro activado' : 'Modo claro activado');
+        }
+
+        // Cargar preferencia de tema al iniciar
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#121212');
+        }
+
+        function toggleFullscreen() {
+            if (document.fullscreenElement) {
+                document.exitFullscreen().then(() => {
+                    showToast('Modo pantalla completa desactivado');
+                }).catch(err => {
+                    showToast(`Error al salir de pantalla completa: ${err.message}`, 4000);
+                });
+            } else {
+                document.documentElement.requestFullscreen().then(() => {
+                    showToast('Modo pantalla completa activado');
+                }).catch(err => {
+                    showToast(`Error al activar pantalla completa: ${err.message}`, 4000);
+                });
+            }
+        }
+
+        // Funciones de navegación mejoradas
+        function mostrarSeccion(seccionId) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.modulo-seccion').forEach(seccion => {
+                seccion.classList.remove('active');
+            });
+            
+            // Mostrar la sección solicitada
+            const seccion = document.getElementById(seccionId);
+            if (seccion) {
+                seccion.classList.add('active');
+                currentSection = seccionId;
+            } else {
+                // Si no se encuentra la sección, volver al menú principal
+                document.getElementById('main-menu').classList.add('active');
+                currentSection = 'main-menu';
+            }
+
+            // Controlar visibilidad del botón flotante
+            const fabVentas = document.getElementById('fab-ventas');
+            fabVentas.style.display = (seccionId === 'main-menu') ? 'flex' : 'none';
+
+            // Cargar datos específicos de la sección
+            cargarDatosSeccion(seccionId);
+        }
+
+        function cargarDatosSeccion(seccionId) {
+            switch(seccionId) {
+                case 'seccion-inventario':
+                    renderizarInventario();
+                    break;
+                case 'seccion-clientes':
+                    renderizarClientes();
+                    break;
+                case 'seccion-ventas':
+                    renderizarClientesDatalist();
+                    renderizarProductosDatalist();
+                    renderizarProductosEnVenta();
+                    break;
+                case 'seccion-reportes':
+                    generarReporte();
+                    break;
+                case 'seccion-proveedores':
+                    renderizarProveedores();
+                    break;
+                case 'seccion-contabilidad':
+                    renderizarTransacciones();
+                    calcularBalance();
+                    break;
+                case 'seccion-facturacion':
+                    renderizarFacturas();
+                    break;
+                case 'seccion-ajustes':
+                    renderizarEventos();
+                    document.getElementById('api-key').value = db.apiKey || '';
+                    break;
+            }
+        }
+
+        function volverAlMenuPrincipal() {
+            mostrarSeccion('main-menu');
+        }
+
+        // Funciones para mostrar/ocultar modales
+        function mostrarMiniModalProducto(productoId = null) {
+            const modal = document.getElementById('mini-modal-producto');
+            const titulo = document.getElementById('modal-producto-titulo');
+            const idInput = document.getElementById('producto-id-editar');
+            const nombreInput = document.getElementById('producto-nombre');
+            const precioInput = document.getElementById('producto-precio');
+            const stockInput = document.getElementById('producto-stock');
+            const categoriaInput = document.getElementById('producto-categoria');
+            const codigoInput = document.getElementById('producto-codigo');
+
+            if (productoId) {
+                const producto = db.productos.find(p => p.id === productoId);
+                if (producto) {
+                    titulo.textContent = 'Editar Producto';
+                    idInput.value = producto.id;
+                    nombreInput.value = producto.nombre;
+                    precioInput.value = producto.precio;
+                    stockInput.value = producto.stock;
+                    categoriaInput.value = producto.categoria || '';
+                    codigoInput.value = producto.codigo || '';
+                }
+            } else {
+                titulo.textContent = 'Añadir Producto';
+                idInput.value = '';
+                nombreInput.value = '';
+                precioInput.value = '';
+                stockInput.value = '';
+                categoriaInput.value = '';
+                codigoInput.value = '';
+            }
+            modal.style.display = 'flex';
+        }
+
+        function ocultarMiniModalProducto() {
+            document.getElementById('mini-modal-producto').style.display = 'none';
+        }
+
+        function mostrarMiniModalCliente(clienteId = null) {
+            const modal = document.getElementById('mini-modal-cliente');
+            const titulo = document.getElementById('modal-cliente-titulo');
+            const idInput = document.getElementById('cliente-id-editar');
+            const nombreInput = document.getElementById('cliente-nombre');
+            const telefonoInput = document.getElementById('cliente-telefono');
+            const emailInput = document.getElementById('cliente-email');
+            const direccionInput = document.getElementById('cliente-direccion');
+
+            if (clienteId) {
+                const cliente = db.clientes.find(c => c.id === clienteId);
+                if (cliente) {
+                    titulo.textContent = 'Editar Cliente';
+                    idInput.value = cliente.id;
+                    nombreInput.value = cliente.nombre;
+                    telefonoInput.value = cliente.telefono;
+                    emailInput.value = cliente.email || '';
+                    direccionInput.value = cliente.direccion || '';
+                }
+            } else {
+                titulo.textContent = 'Añadir Cliente';
+                idInput.value = '';
+                nombreInput.value = '';
+                telefonoInput.value = '';
+                emailInput.value = '';
+                direccionInput.value = '';
+            }
+            modal.style.display = 'flex';
+        }
+
+        function ocultarMiniModalCliente() {
+            document.getElementById('mini-modal-cliente').style.display = 'none';
+        }
+
+        function mostrarMiniModalProveedor(proveedorId = null) { 
+            const modal = document.getElementById('mini-modal-proveedor');
+            const titulo = document.getElementById('modal-proveedor-titulo');
+            const idInput = document.getElementById('proveedor-id-editar');
+            const nombreInput = document.getElementById('proveedor-nombre');
+            const contactoInput = document.getElementById('proveedor-contacto');
+            const telefonoInput = document.getElementById('proveedor-telefono');
+            const emailInput = document.getElementById('proveedor-email');
+            const rifInput = document.getElementById('proveedor-rif');
+
+            if (proveedorId) {
+                const proveedor = db.proveedores.find(p => p.id === proveedorId);
+                if (proveedor) {
+                    titulo.textContent = 'Editar Proveedor';
+                    idInput.value = proveedor.id;
+                    nombreInput.value = proveedor.nombre;
+                    contactoInput.value = proveedor.contacto;
+                    telefonoInput.value = proveedor.telefono;
+                    emailInput.value = proveedor.email || '';
+                    rifInput.value = proveedor.rif || '';
+                }
+            } else {
+                titulo.textContent = 'Añadir Proveedor';
+                idInput.value = '';
+                nombreInput.value = '';
+                contactoInput.value = '';
+                telefonoInput.value = '';
+                emailInput.value = '';
+                rifInput.value = '';
+            }
+            modal.style.display = 'flex';
+        }
+
+        function ocultarMiniModalProveedor() { 
+            document.getElementById('mini-modal-proveedor').style.display = 'none';
+        }
+
+        function mostrarMiniModalTransaccion(transaccionId = null) { 
+            const modal = document.getElementById('mini-modal-transaccion');
+            const idInput = document.getElementById('transaccion-id-editar');
+            const tipoInput = document.getElementById('transaccion-tipo');
+            const montoInput = document.getElementById('transaccion-monto');
+            const descripcionInput = document.getElementById('transaccion-descripcion');
+            const fechaInput = document.getElementById('transaccion-fecha');
+
+            if (transaccionId) {
+                const transaccion = db.transacciones.find(t => t.id === transaccionId);
+                if (transaccion) {
+                    idInput.value = transaccion.id;
+                    tipoInput.value = transaccion.tipo;
+                    montoInput.value = transaccion.monto;
+                    descripcionInput.value = transaccion.descripcion;
+                    fechaInput.value = transaccion.fecha; 
+                }
+            } else {
+                idInput.value = '';
+                tipoInput.value = 'ingreso';
+                montoInput.value = '';
+                descripcionInput.value = '';
+                fechaInput.valueAsDate = new Date();
+            }
+            modal.style.display = 'flex';
+        }
+
+        function ocultarMiniModalTransaccion() { 
+            document.getElementById('mini-modal-transaccion').style.display = 'none';
+        }
+
+        function mostrarMiniModalEvento(eventoId = null) { 
+            const modal = document.getElementById('mini-modal-evento');
+            const tituloModal = document.getElementById('modal-evento-titulo');
+            const idInput = document.getElementById('evento-id-editar');
+            const tituloInput = document.getElementById('evento-titulo');
+            const descripcionInput = document.getElementById('evento-descripcion');
+            const fechaInput = document.getElementById('evento-fecha');
+            const horaInput = document.getElementById('evento-hora');
+
+            if (eventoId) {
+                const evento = db.eventos.find(e => e.id === eventoId);
+                if (evento) {
+                    tituloModal.textContent = 'Editar Evento';
+                    idInput.value = evento.id;
+                    tituloInput.value = evento.titulo;
+                    descripcionInput.value = evento.descripcion;
+                    fechaInput.value = evento.fecha;
+                    horaInput.value = evento.hora;
+                }
+            } else {
+                tituloModal.textContent = 'Añadir Evento';
+                idInput.value = '';
+                tituloInput.value = '';
+                descripcionInput.value = '';
+                
+                const now = new Date();
+                fechaInput.value = now.toISOString().slice(0, 10);
+                horaInput.value = now.toTimeString().slice(0, 5); 
+            }
+            modal.style.display = 'flex';
+        }
+
+        function ocultarMiniModalEvento() { 
+            document.getElementById('mini-modal-evento').style.display = 'none';
+        }
+
+        function mostrarMiniModalAgregarProducto() {
+            document.getElementById('mini-modal-agregar-producto').style.display = 'flex';
+            document.getElementById('producto-input').value = '';
+            document.getElementById('cantidad-producto').value = 1;
+            renderizarProductosDatalist(); 
+        }
+
+        function ocultarMiniModalAgregarProducto() {
+            document.getElementById('mini-modal-agregar-producto').style.display = 'none';
+        }
+
+        // Función para cambiar entre campos de registro
+        function toggleRegistroFields() {
+            const rol = document.getElementById('usuario-rol').value;
+            document.getElementById('propietario-fields').style.display = rol === 'propietario' ? 'block' : 'none';
+            document.getElementById('empleado-fields').style.display = rol === 'empleado' ? 'block' : 'none';
+            document.getElementById('codigo-verificacion').style.display = 'none';
+        }
+
+        // Función para enviar código de verificación (con simulación realista)
+        function enviarCodigoVerificacion() {
+            const nombre = document.getElementById('propietario-nombre').value;
+            const email = document.getElementById('propietario-email').value;
+            const telefono = document.getElementById('propietario-telefono').value;
+            
+            if (!nombre || !email || !telefono) {
+                showToast('Por favor, completa todos los campos');
+                return;
+            }
+            
+            // Deshabilitar botón durante el envío
+            const btnEnviar = document.getElementById('btn-enviar-codigo');
+            btnEnviar.disabled = true;
+            btnEnviar.textContent = 'Enviando...';
+            
+            // Mostrar la sección de verificación
+            document.getElementById('codigo-verificacion').style.display = 'block';
+            document.getElementById('enviando-container').style.display = 'flex';
+            document.getElementById('codigo-container').style.display = 'none';
+            
+            // Generar código de 6 dígitos
+            codigoGenerado = Math.floor(100000 + Math.random() * 900000);
+            
+            // Simular proceso de envío
+            let progreso = 0;
+            const barraProgreso = document.getElementById('barra-progreso');
+            const temporizador = document.getElementById('temporizador');
+            
+            const intervalo = setInterval(() => {
+                progreso += 5;
+                barraProgreso.style.width = progreso + '%';
+                
+                if (progreso < 30) {
+                    temporizador.textContent = "Conectando al servidor...";
+                } else if (progreso < 60) {
+                    temporizador.textContent = "Preparando el mensaje...";
+                } else if (progreso < 90) {
+                    temporizador.textContent = "Enviando correo...";
+                } else {
+                    temporizador.textContent = "¡Código enviado con éxito!";
+                }
+                
+                if (progreso >= 100) {
+                    clearInterval(intervalo);
+                    
+                    // Mostrar el código después de simular el envío
+                    setTimeout(() => {
+                        document.getElementById('enviando-container').style.display = 'none';
+                        document.getElementById('codigo-container').style.display = 'block';
+                        document.getElementById('codigo-display').textContent = codigoGenerado;
+                        
+                        // Mostrar mensaje
+                        showToast(`Código enviado a ${email}. Por favor revisa tu correo.`);
+                        
+                        // Restaurar botón
+                        btnEnviar.disabled = false;
+                        btnEnviar.textContent = 'Enviar Código';
+                    }, 800);
+                }
+            }, 100);
+        }
+        
+        // Función para verificar el código ingresado
+        function verificarCodigo() {
+            const codigoIngresado = document.getElementById('codigo-input').value;
+            
+            if (!codigoIngresado) {
+                showToast('Por favor ingresa el código de verificación');
+                return;
+            }
+            
+            if (codigoIngresado == codigoGenerado) {
+                completarRegistroPropietario();
+            } else {
+                showToast('Código incorrecto. Inténtalo de nuevo.');
+            }
+        }
+        
+        // Función para completar registro de propietario
+        function completarRegistroPropietario() {
+            const nombreTienda = document.getElementById('tienda-nombre').value;
+            const nombrePropietario = document.getElementById('propietario-nombre').value;
+            
+            usuarioActual = {
+                nombre: nombrePropietario,
+                email: document.getElementById('propietario-email').value,
+                telefono: document.getElementById('propietario-telefono').value,
+                tienda: nombreTienda,
+                rol: 'propietario'
+            };
+            
+            // Guardar en sessionStorage
+            sessionStorage.setItem('usuarioActual', JSON.stringify(usuarioActual));
+            
+            // Mostrar menú principal
+            mostrarSeccion('main-menu');
+            actualizarUIporRol();
+            
+            showToast(`Registro completado. ¡Bienvenido ${nombrePropietario}!`);
+        }
+        
+        // Función para validar código de empleado
+        function validarCodigoEmpleado() {
+            const codigoIngresado = document.getElementById('codigo-emparejamiento').value;
+            const nombreEmpleado = document.getElementById('empleado-nombre').value;
+            
+            if (!codigoIngresado || !nombreEmpleado) {
+                showToast('Por favor completa todos los campos');
+                return;
+            }
+            
+            // Validación simple de código (en un caso real sería más complejo)
+            if (codigoIngresado.length < 6) {
+                showToast('Código inválido. Debe tener al menos 6 caracteres');
+                return;
+            }
+            
+            usuarioActual = {
+                nombre: nombreEmpleado,
+                rol: 'empleado'
+            };
+            
+            // Guardar en sessionStorage
+            sessionStorage.setItem('usuarioActual', JSON.stringify(usuarioActual));
+            
+            // Mostrar menú principal
+            mostrarSeccion('main-menu');
+            actualizarUIporRol();
+            
+            showToast(`¡Bienvenido ${nombreEmpleado}! Modo empleado activado.`);
+        }
+        
+        // Actualizar interfaz según rol
+        function actualizarUIporRol() {
+            if (!usuarioActual) return;
+            
+            // Actualizar nombre de usuario
+            document.getElementById('nombre-usuario').textContent = usuarioActual.nombre;
+            
+            // Actualizar badge de rol
+            const badgeRol = document.getElementById('badge-rol');
+            badgeRol.textContent = usuarioActual.rol === 'propietario' ? 'Propietario' : 'Empleado';
+            badgeRol.className = 'permiso-badge ' + (usuarioActual.rol === 'propietario' ? 'propietario' : 'empleado');
+        }
+
+        // Persistencia de datos
+        function generarId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function guardarDatos() {
+            showLoading('Guardando datos...');
+            setTimeout(() => {
+                try {
+                    localStorage.setItem('gestorDb', JSON.stringify(db));
+                } catch (e) {
+                    console.error("Error al guardar datos en localStorage:", e);
+                    showToast("Error al guardar datos: " + e.message, 5000);
+                } finally {
+                    hideLoading();
+                    showToast('Datos guardados correctamente');
+                    actualizarUI();
+                }
+            }, 500); 
+        }
+
+        function cargarDatos() {
+            try {
+                const storedDb = localStorage.getItem('gestorDb');
+                if (storedDb) {
+                    db = JSON.parse(storedDb);
+                }
+            } catch (e) {
+                console.error("Error al cargar datos de localStorage:", e);
+                showToast("Error al cargar datos: " + e.message, 5000);
+            }
+            
+            // Asegurar que todas las propiedades existan
+            db.productos = db.productos || [];
+            db.clientes = db.clientes || [];
+            db.ventas = db.ventas || [];
+            db.proveedores = db.proveedores || []; 
+            db.transacciones = db.transacciones || []; 
+            db.eventos = db.eventos || []; 
+            db.tipoCambioReal = db.tipoCambioReal || 0;
+            db.tipoCambioCalculo = db.tipoCambioCalculo || 0;
+            db.apiKey = db.apiKey || '';
+            db.tasasCambioAlternativas = db.tasasCambioAlternativas || [];
+            
+            document.getElementById('api-key').value = db.apiKey;
+        }
+
+        // Obtener tipo de cambio con múltiples fuentes
+        async function obtenerTipoCambioAPI() {
+            const apiKey = db.apiKey;
+            if (!apiKey) {
+                throw new Error("No hay API Key configurada. Por favor, ve a Ajustes para añadirla.");
+            }
+            const url = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`;
+            
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`Error en la API: ${response.status}`);
+                }
+                const data = await response.json();
+                if (data && data.conversion_rates && data.conversion_rates.VES) {
+                    return data.conversion_rates.VES;
+                } else {
+                    throw new Error("No se encontró la tasa de cambio para VES.");
+                }
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        async function obtenerTipoCambio() {
+            showLoading('Actualizando tipo de cambio...');
+            try {
+                const tasa = await obtenerTipoCambioAPI();
+                db.tipoCambioReal = tasa;
+                if (db.tipoCambioCalculo === 0) {
+                    db.tipoCambioCalculo = tasa;
+                }
+                guardarDatos(); 
+                showToast('Tipo de cambio actualizado');
+            } catch (error) {
+                console.error("Error al obtener tipo de cambio:", error);
+                if (db.tipoCambioReal === 0) {
+                    db.tipoCambioCalculo = 36; 
+                    db.tipoCambioReal = 36;
+                    showToast(`Error: ${error.message}. Se usará un valor por defecto de 36 VES/USD.`, 6000);
+                } else {
+                    showToast(`Error: ${error.message}. Se usará el último valor conocido.`, 6000);
+                }
+            } finally {
+                hideLoading();
+                actualizarUI();
+            }
+        }
+
+        // Actualizar UI
+        function actualizarUI() {
+            const tasaInfo = document.getElementById('tasa-cambio-info');
+            if (db.tipoCambioReal > 0) {
+                tasaInfo.textContent = `Tasa Real: 1 USD = ${db.tipoCambioReal.toFixed(2)} VES | Tasa Cálculo: 1 USD = ${db.tipoCambioCalculo.toFixed(2)} VES`;
+            } else if (db.tipoCambioCalculo > 0) {
+                tasaInfo.textContent = `Tasa Cálculo: 1 USD = ${db.tipoCambioCalculo.toFixed(2)} VES`;
+            } else {
+                tasaInfo.textContent = 'Tasa de Cambio: No disponible. Configura la API Key en Ajustes.';
+            }
+
+            // Actualizar datos específicos de la sección actual
+            cargarDatosSeccion(currentSection);
+        }
+
+        // Renderizado de inventario
+        function renderizarInventario() {
+            const lista = document.getElementById('inventario-lista');
+            
+            if (db.productos.length === 0) {
+                lista.innerHTML = '<tr><td colspan="6" class="empty-state">No hay productos en el inventario</td></tr>';
+                return;
+            }
+
+            lista.innerHTML = '';
+
+            const searchInput = document.getElementById('search-producto');
+            const filtro = searchInput.value.toLowerCase();
+
+            const productosFiltrados = db.productos.filter(p => 
+                p.nombre.toLowerCase().includes(filtro) || 
+                (p.categoria && p.categoria.toLowerCase().includes(filtro)) || 
+                (p.codigo && p.codigo.toLowerCase().includes(filtro))
+            );
+
+            if (productosFiltrados.length === 0) {
+                lista.innerHTML = '<tr><td colspan="6" class="empty-state">No se encontraron productos</td></tr>';
+                return;
+            }
+
+            productosFiltrados.forEach(producto => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${producto.id.substring(0, 5)}...</td>
+                    <td>${producto.nombre}</td>
+                    <td>$${producto.precio.toFixed(2)}</td>
+                    <td>${producto.stock}</td>
+                    <td>${producto.categoria || 'Sin categoría'}</td>
+                    <td class="action-buttons">
+                        <button class="action-btn edit-btn" onclick="mostrarMiniModalProducto('${producto.id}')">Editar</button>
+                        <button class="action-btn delete-btn" onclick="eliminarProducto('${producto.id}')">Eliminar</button>
+                    </td>
+                `;
+                lista.appendChild(tr);
+            });
+        }
+
+        function filtrarProductos() {
+            renderizarInventario();
+        }
+
+        // Renderizado de clientes
+        function renderizarClientes() {
+            const lista = document.getElementById('clientes-lista');
+            
+            if (db.clientes.length === 0) {
+                lista.innerHTML = '<tr><td colspan="5" class="empty-state">No hay clientes registrados</td></tr>';
+                return;
+            }
+
+            lista.innerHTML = '';
+
+            const searchInput = document.getElementById('search-cliente');
+            const filtro = searchInput.value.toLowerCase();
+
+            const clientesFiltrados = db.clientes.filter(c => 
+                c.nombre.toLowerCase().includes(filtro) || 
+                c.telefono.toLowerCase().includes(filtro) || 
+                (c.email && c.email.toLowerCase().includes(filtro))
+            );
+
+            if (clientesFiltrados.length === 0) {
+                lista.innerHTML = '<tr><td colspan="5" class="empty-state">No se encontraron clientes</td></tr>';
+                return;
+            }
+
+            clientesFiltrados.forEach(cliente => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${cliente.id.substring(0, 5)}...</td>
+                    <td>${cliente.nombre}</td>
+                    <td>${cliente.telefono}</td>
+                    <td>${cliente.email || 'N/A'}</td>
+                    <td class="action-buttons">
+                        <button class="action-btn edit-btn" onclick="mostrarMiniModalCliente('${cliente.id}')">Editar</button>
+                        <button class="action-btn delete-btn" onclick="eliminarCliente('${cliente.id}')">Eliminar</button>
+                    </td>
+                `;
+                lista.appendChild(tr);
+            });
+        }
+
+        function filtrarClientes() {
+            renderizarClientes();
+        }
+
+        // Funciones para guardar datos
+        function guardarProducto() {
+            const id = document.getElementById('producto-id-editar').value;
+            const nombre = document.getElementById('producto-nombre').value.trim();
+            const precio = parseFloat(document.getElementById('producto-precio').value);
+            const stock = parseInt(document.getElementById('producto-stock').value);
+            const categoria = document.getElementById('producto-categoria').value.trim();
+            const codigo = document.getElementById('producto-codigo').value.trim();
+
+            if (!nombre || isNaN(precio) || precio <= 0 || isNaN(stock) || stock < 0) {
+                showToast('Por favor, completa todos los campos de producto correctamente.');
+                return;
+            }
+
+            if (id) {
+                const index = db.productos.findIndex(p => p.id === id);
+                if (index !== -1) {
+                    db.productos[index] = { id, nombre, precio, stock, categoria, codigo };
+                    showToast('Producto actualizado exitosamente.');
+                }
+            } else {
+                db.productos.push({ id: generarId(), nombre, precio, stock, categoria, codigo });
+                showToast('Producto añadido exitosamente.');
+            }
+            guardarDatos();
+            ocultarMiniModalProducto();
+        }
+
+        function eliminarProducto(id) {
+            if (confirm('¿Estás seguro de eliminar este producto?')) {
+                db.productos = db.productos.filter(p => p.id !== id);
+                guardarDatos();
+                showToast('Producto eliminado.');
+            }
+        }
+
+        function guardarCliente() {
+            const id = document.getElementById('cliente-id-editar').value;
+            const nombre = document.getElementById('cliente-nombre').value.trim();
+            const telefono = document.getElementById('cliente-telefono').value.trim();
+            const email = document.getElementById('cliente-email').value.trim();
+            const direccion = document.getElementById('cliente-direccion').value.trim();
+
+            if (!nombre) {
+                showToast('Por favor, ingresa el nombre del cliente.');
+                return;
+            }
+
+            if (id) {
+                const index = db.clientes.findIndex(c => c.id === id);
+                if (index !== -1) {
+                    db.clientes[index] = { id, nombre, telefono, email, direccion };
+                    showToast('Cliente actualizado exitosamente.');
+                }
+            } else {
+                db.clientes.push({ id: generarId(), nombre, telefono, email, direccion });
+                showToast('Cliente añadido exitosamente.');
+            }
+            guardarDatos();
+            ocultarMiniModalCliente();
+        }
+
+        function eliminarCliente(id) {
+            if (confirm('¿Estás seguro de eliminar este cliente?')) {
+                db.clientes = db.clientes.filter(c => c.id !== id);
+                guardarDatos();
+                showToast('Cliente eliminado.');
+            }
+        }
+
+        // Función para guardar tasa manual
+        function guardarTasaManual() {
+            const tasaInput = document.getElementById('tasa-manual');
+            const tasa = parseFloat(tasaInput.value);
+            
+            if (isNaN(tasa)) {
+                showToast('Por favor ingresa un número válido para la tasa de cambio');
+                return;
+            }
+            
+            if (tasa <= 0) {
+                showToast('La tasa de cambio debe ser un valor positivo');
+                return;
+            }
+            
+            db.tipoCambioCalculo = tasa;
+            guardarDatos();
+            showToast(`Tasa de cálculo actualizada a ${tasa.toFixed(2)} VES/USD`);
+            actualizarUI();
+        }
+
+        function cerrarSesion() {
+            sessionStorage.removeItem('usuarioActual');
+            usuarioActual = null;
+            mostrarSeccion('seccion-registro');
+            showToast('Sesión cerrada correctamente');
+        }
+
+        // Inicialización mejorada
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cargar datos y configurar la aplicación
+            cargarDatos();
+            
+            // Verificar si hay un usuario autenticado
+            const usuarioGuardado = sessionStorage.getItem('usuarioActual');
+            if (usuarioGuardado) {
+                usuarioActual = JSON.parse(usuarioGuardado);
+                mostrarSeccion('main-menu');
+                actualizarUIporRol();
+            } else {
+                mostrarSeccion('seccion-registro');
+            }
+            
+            // Establecer valores predeterminados si es necesario
+            if (db.tipoCambioReal === 0) {
+                db.tipoCambioReal = 36;
+                db.tipoCambioCalculo = 36;
+            }
+            
+            // Actualizar UI
+            actualizarUI();
+            
+            // Mensaje de bienvenida
+            setTimeout(() => {
+                showToast('Bienvenido al Gestor Empresarial');
+            }, 1000);
+            
+            // Iniciar verificación de alarmas
+            setInterval(verificarAlarmas, 60000); // Verificar cada minuto
+        });
+
+        // Función para verificar alarmas
+        function verificarAlarmas() {
+            const now = new Date();
+            db.eventos.forEach(evento => {
+                const eventDateTime = new Date(`${evento.fecha}T${evento.hora}`);
+                if (!evento.sounded && eventDateTime <= now) {
+                    const alarmSound = document.getElementById('alarm-sound');
+                    try {
+                        alarmSound.play();
+                    } catch(e) {
+                        console.log('No se pudo reproducir la alarma:', e);
+                    }
+                    showToast(`¡Alarma! Evento: "${evento.titulo}"`, 10000);
+                    evento.sounded = true;
+                }
+            });
+            guardarDatos();
+        }
+
+        // Función para agregar producto a venta
+        function agregarProductoAVenta() {
+            const productoInput = document.getElementById('producto-input');
+            const cantidadInput = document.getElementById('cantidad-producto');
+            const cantidad = parseInt(cantidadInput.value);
+
+            // Buscar producto por nombre
+            const nombreProducto = productoInput.value.split('(')[0].trim();
+            const producto = db.productos.find(p => p.nombre.toLowerCase().includes(nombreProducto.toLowerCase()));
+            
+            if (!producto || isNaN(cantidad) || cantidad <= 0) {
+                showToast('Por favor, selecciona un producto válido y una cantidad mayor a cero.');
+                return;
+            }
+
+            // Verificar stock
+            if (producto.stock < cantidad) {
+                showToast(`No hay suficiente stock de ${producto.nombre}. Disponible: ${producto.stock}`);
+                return;
+            }
+
+            // Agregar al carrito
+            const itemExistente = productosEnVenta.find(item => item.id === producto.id);
+            if (itemExistente) {
+                itemExistente.cantidad += cantidad;
+            } else {
+                productosEnVenta.push({
+                    id: producto.id,
+                    nombre: producto.nombre,
+                    precio: producto.precio,
+                    cantidad: cantidad
+                });
+            }
+            
+            showToast(`${cantidad} unidades de ${producto.nombre} añadidas al carrito.`);
+            renderizarProductosEnVenta();
+            ocultarMiniModalAgregarProducto();
+        }
+
+        // Función para renderizar productos en venta
+        function renderizarProductosEnVenta() {
+            const lista = document.getElementById('productos-en-venta-lista');
+            lista.innerHTML = '';
+            let totalUSD = 0;
+
+            if (productosEnVenta.length === 0) {
+                lista.innerHTML = '<li class="empty-state">No hay productos en el carrito</li>';
+            } else {
+                productosEnVenta.forEach((item, index) => {
+                    const subtotal = item.precio * item.cantidad;
+                    totalUSD += subtotal;
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <div class="item-info">
+                            ${item.nombre} (x${item.cantidad}) - $${subtotal.toFixed(2)} USD 
+                            (${ (subtotal * db.tipoCambioCalculo).toFixed(2) } VES)
+                        </div>
+                        <div class="item-actions">
+                            <button onclick="quitarProductoDeVenta(${index})">Quitar</button>
+                        </div>
+                    `;
+                    lista.appendChild(li);
+                });
+            }
+
+            document.getElementById('total-usd').textContent = totalUSD.toFixed(2);
+            document.getElementById('total-ves').textContent = (totalUSD * db.tipoCambioCalculo).toFixed(2);
+        }
+
+        // Función para quitar producto de venta
+        function quitarProductoDeVenta(index) {
+            const nombreProducto = productosEnVenta[index].nombre;
+            productosEnVenta.splice(index, 1);
+            showToast(`"${nombreProducto}" quitado del carrito.`);
+            renderizarProductosEnVenta();
+        }
+
+        // Función para procesar venta
+        function procesarVenta() {
+            if (productosEnVenta.length === 0) {
+                showToast('No hay productos en el carrito para procesar la venta.');
+                return;
+            }
+
+            // Crear venta
+            const venta = {
+                id: generarId(),
+                fecha: new Date().toISOString(),
+                productos: productosEnVenta.map(item => ({
+                    id: item.id,
+                    nombre: item.nombre,
+                    precioUnitario: item.precio,
+                    cantidad: item.cantidad,
+                    subtotalUSD: item.precio * item.cantidad
+                })),
+                totalUSD: productosEnVenta.reduce((total, item) => total + (item.precio * item.cantidad), 0),
+                totalVES: productosEnVenta.reduce((total, item) => total + (item.precio * item.cantidad * db.tipoCambioCalculo), 0)
+            };
+
+            // Guardar venta
+            db.ventas.push(venta);
+            guardarDatos();
+            
+            // Limpiar carrito
+            productosEnVenta = [];
+            renderizarProductosEnVenta();
+            
+            showToast(`Venta procesada exitosamente. Total: $${venta.totalUSD.toFixed(2)} USD / ${venta.totalVES.toFixed(2)} VES`);
+        }
+
+        // Función para guardar API key
+        function guardarAPIKey() {
+            const apiKeyInput = document.getElementById('api-key');
+            const newKey = apiKeyInput.value.trim();
+            if (newKey) {
+                db.apiKey = newKey;
+                guardarDatos();
+                showToast('API Key guardada exitosamente.');
+            } else {
+                showToast('La API Key no puede estar vacía.');
+            }
+        }
+
+        // Función para resetear datos
+        function resetearDatos() {
+            if (confirm('¿Estás seguro de que quieres resetear TODOS los datos? Esta acción es irreversible.')) {
+                db = {
+                    productos: [],
+                    clientes: [],
+                    ventas: [],
+                    proveedores: [], 
+                    transacciones: [], 
+                    eventos: [], 
+                    tipoCambioReal: 36, 
+                    tipoCambioCalculo: 36, 
+                    apiKey: '',
+                    tasasCambioAlternativas: []
+                };
+                productosEnVenta = [];
+                localStorage.removeItem('gestorDb');
+                showToast('Todos los datos han sido reseteados');
+                actualizarUI();
+            }
+        }
+
+        // Renderizar listas de datos para autocompletar
+        function renderizarClientesDatalist() {
+            const datalist = document.getElementById('lista-clientes-venta');
+            datalist.innerHTML = '';
+            db.clientes.forEach(cliente => {
+                const option = document.createElement('option');
+                option.value = cliente.nombre;
+                datalist.appendChild(option);
+            });
+        }
+
+        function renderizarProductosDatalist() {
+            const datalist = document.getElementById('lista-productos-datalist');
+            datalist.innerHTML = '';
+            db.productos.forEach(producto => {
+                const option = document.createElement('option');
+                option.value = `${producto.nombre} ($${producto.precio.toFixed(2)}) - Stock: ${producto.stock}`;
+                datalist.appendChild(option);
+            });
+        }
+    </script>
+</body>
+</html>
